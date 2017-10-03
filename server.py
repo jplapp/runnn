@@ -19,6 +19,16 @@ def get_scores(args):
   data.pretty_print(('ID_task', 'score'), scores)
 
 
+def run_sql(args):
+  data.execute(args.cmd)
+
+
+actions = {
+  'run': add_run,
+  'get_scores': get_scores,
+  'sql': run_sql
+}
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -32,11 +42,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
-    if args.action == 'run':
-      add_run(args)
-    elif args.action == 'get_scores':
-      get_scores(args)
-    else:
+    if not args.action in actions:
       print('unknown action ', args.action)
-
+    else:
+      func = actions[args.action]
+      func(args)
