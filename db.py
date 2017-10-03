@@ -1,6 +1,8 @@
+from __future__  import print_function
+
 import datetime, time
 import sqlite3 as sql
-
+from tabulate import tabulate
 
 # Constants.
 QUEUED = 'queued'
@@ -116,16 +118,13 @@ class DB:
     :param data: list of entries. should have as many fields as len(columns)
     :return:
     """
-
-    print(columns)
-    for i in data:
-      print(i)
+    print(tabulate(data, tablefmt='psql'))
 
   def execute(self, cmd):
     """
     run an arbitrary sql command, and print the result
     :param cmd: 
-    :return: 
+    :return:
     """
     def f(c):
       c.execute(cmd)

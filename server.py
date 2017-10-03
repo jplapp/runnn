@@ -1,9 +1,9 @@
+from __future__ import print_function
 import argparse
 
 import db
 
 data = db.DB()
-
 
 def add_run(args):
   data.add_run(args.tag, args.cmd, args.params, args.num_iters)
