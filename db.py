@@ -96,18 +96,30 @@ class DB:
 
 
 
+  def get_scores(self, run_tag):
+    def get_scores(c):
+      c.execute("SELECT ID_task, score from tasks, runs WHERE tasks.ID_run = runs.ID_run AND runs.tag = ? ORDER BY score ASC", (run_tag,))
+      return c.fetchall()
 
-  def _time_str(self):
-    return datetime.datetime.now().strftime("%d.%m %H:%M")
-
-  def _add_single_job(self, cursor, cmd, logfile, status):
-    cursor.execute("insert into jobs(cmd, logfile, status, tries, host, time) values (?, ?, ?, ?, ?, ?)",
-                   (cmd, logfile, status, 0, '', self._time_str()))
+    return self._run(get_scores)
 
   def _commit_and_close(self, conn, cursor):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+  def pretty_print(self, columns, data):
+    """
+
+    :param columns: column headers
+    :param data: list of entries. should have as many fields as len(columns)
+    :return:
+    """
+
+    print(columns)
+    for i in data:
+      print(i)
 
 
 
