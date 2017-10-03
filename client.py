@@ -6,7 +6,7 @@ import db
 data = db.DB()
 
 SLEEP_TIME = 10  # seconds
-
+SCORE_PREFIX = 'final_score'
 
 
 def register_client():
@@ -25,13 +25,11 @@ def process_task():
 #(1, 3, None, u'cmd', u'params', u'queued', None, u'2017-10-03 11:10:35', None
   (id_task, id_run, id_client, cmd, params, status, log, changed, score) = task
 
-  log = subprocess.PIPE
-
-  proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
   data.update_task(id_task, db.PROCESSING)
 
-  log = ''
+  log = []
 
   while True:
     output = proc.stdout.readline()
@@ -39,17 +37,21 @@ def process_task():
       break
     if output:
       print('>> ' + output.strip())
-      log = log + output.strip()
+      log.append(output.strip())
 
   rc = proc.poll()
 
-  print('rc', rc)
-
   if rc == 0:
-    #todo: get score from log
-    data.update_task(id_task, db.DONE, log, score=1)
+    score_lines = [line for line in log if line.startswith(SCORE_PREFIX)]
+
+    if len(score_lines):
+      score = float(score_lines[0][len(SCORE_PREFIX)+1:])
+    else:
+      score = 0
+
+    data.update_task(id_task, db.DONE, '\n'.join(log), score)
   else:
-    data.update_task(id_task, db.FAILED, log)
+    data.update_task(id_task, db.FAILED, '\n'.join(log))
 
   time.sleep(1)
 
