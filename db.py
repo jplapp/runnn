@@ -121,6 +121,18 @@ class DB:
     for i in data:
       print(i)
 
+  def execute(self, cmd):
+    """
+    run an arbitrary sql command, and print the result
+    :param cmd: 
+    :return: 
+    """
+    def f(c):
+      c.execute(cmd)
+      return c.fetchall()
+
+    self.pretty_print('unknown column headers', self._run(f))
+
 
 
 if __name__ == '__main__':
