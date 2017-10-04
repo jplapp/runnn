@@ -48,7 +48,6 @@ class DB:
 
   def add_run(self, tag, cmd, params, num_iters=20):
     # 1) add to db, get ID
-
     def add_to_db(c):
       c.execute('INSERT INTO runs (tag, cmd, params) VALUES (?,?,?)', (tag, cmd, params))
       print(c.lastrowid)
@@ -98,12 +97,21 @@ class DB:
 
 
 
-  def get_scores(self, run_tag):
-    def get_scores(c):
+  def get_scores(self, run_tag=None, id_run=None):
+    def get_scores_with_tag(c):
       c.execute("SELECT ID_task, score from tasks, runs WHERE tasks.ID_run = runs.ID_run AND runs.tag = ? ORDER BY score ASC", (run_tag,))
       return c.fetchall()
 
-    return self._run(get_scores)
+    def get_scores_by_id(c):
+      c.execute("SELECT ID_task, score from tasks WHERE tasks.ID_run = ? ORDER BY score ASC", (id_run,))
+      return c.fetchall()
+
+    if run_tag is not None:
+      return self._run(get_scores_with_tag)
+    elif id_run is not None:
+      return self._run(get_scores_by_id)
+    else:
+      return 'please provide either a run_id or a run_tag'
 
   def _commit_and_close(self, conn, cursor):
     conn.commit()

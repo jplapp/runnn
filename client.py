@@ -33,11 +33,11 @@ def process_task():
 
   while True:
     output = proc.stdout.readline()
-    if output == '' and proc.poll() is not None:
+    if (output == '' or output == b'') and proc.poll() is not None:
       break
     if output:
-      print('>> ' + output.strip())
-      log.append(output.strip())
+      print('>> ' + str(output.strip()))
+      log.append(str(output.strip()))
 
   rc = proc.poll()
 

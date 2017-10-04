@@ -15,7 +15,7 @@ def get_scores(args):
   :param args:
   :return:
   """
-  scores = data.get_scores(args.tag)
+  scores = data.get_scores(args.tag, args.run_id)
   data.pretty_print(('ID_task', 'score'), scores)
 
 
@@ -34,7 +34,8 @@ if __name__ == '__main__':
 
     parser.add_argument("action")
 
-    parser.add_argument("--tag", help="Tag", default='')
+    parser.add_argument("--tag", help="Tag", default=None)
+    parser.add_argument("--run_id", help="Id of the run", type=int, default=None)
     parser.add_argument("--cmd", help="Command to use", default='train.py')
     parser.add_argument("--params", help="Params for the command", default='')
     parser.add_argument("--num_iters", help="How often the command should be repeated", type=int, default=20)
