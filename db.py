@@ -124,6 +124,12 @@ class DB:
 
     self._run(set_client)
 
+  def update_client(self, name, next_action=None):
+    def update(c):
+      c.execute('UPDATE clients SET next_action=? WHERE ID_client=?', (next_action, name))
+
+    return self._run(update)
+
   def check_action(self, name):
     def check(c):
       c.execute('SELECT next_action FROM clients WHERE ID_client=?', (name,))
