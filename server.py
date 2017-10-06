@@ -19,7 +19,7 @@ def add_run(args):
 
 
 def kill_client(args):
-  data.update_client(args.name, next_action='shutdown')
+  data.update_client(args.action[1], next_action='shutdown')
 
 
 def get_scores(args):
@@ -33,7 +33,7 @@ def get_scores(args):
 
 
 def run_sql(args):
-  data.execute(args.cmd)
+  data.execute(args.action[1])
 
 
 actions = {
@@ -46,10 +46,9 @@ actions = {
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
 
-  parser.add_argument("action")
+  parser.add_argument("action", nargs='*')
 
   parser.add_argument("--tag", help="Tag", default=None)
-  parser.add_argument("--name", help="Name", default=None)
   parser.add_argument("--run_id", help="Id of the run", type=int, default=None)
   parser.add_argument("--cmd", help="Command to use", default='train.py')
   parser.add_argument("--params", help="Params for the command", default='')
@@ -57,9 +56,13 @@ if __name__ == '__main__':
 
   args = parser.parse_args()
 
-  if args.action in actions:
-    actions[args.action](args)
-  elif args.action in sql_actions:
-    data.execute(sql_actions[args.action])
+  if len(args.action) == 0:
+    print('please specify an action')
   else:
-    print('unknown action ', args.action)
+    action = args.action[0]
+    if action in actions:
+      actions[action](args)
+    elif action in sql_actions:
+      data.execute(sql_actions[action])
+    else:
+      print('unknown action ', action)
