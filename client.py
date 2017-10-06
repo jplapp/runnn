@@ -1,4 +1,5 @@
-import shlex
+#!/usr/bin/env python3
+
 import subprocess
 import time
 import db
