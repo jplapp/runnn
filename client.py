@@ -8,10 +8,28 @@ data = db.DB()
 SLEEP_TIME = 10  # seconds
 SCORE_PREFIX = 'final_score'
 
+name = subprocess.getoutput('hostname')
 
 def register_client():
-  """TODO:Implement"""
-  2
+  # 1) check if we should do sth
+  gpu_info = subprocess.getoutput('nvidia-smi')
+
+  action = data.check_action(name)
+
+  print(action)
+
+  if action is not None:
+    if action[0] == 'restart':
+      print('restarting')
+      # todo: restart here
+    elif action[0] == 'shutdown':
+      data.set_client_status(name, db.SHUTDOWN, gpu_info)
+      import sys
+      sys.exit()
+
+  # 2) register (or update) client info on db
+  data.set_client_status(name, db.ONLINE, gpu_info)
+
 
 def process_task():
   task = data.get_task()
@@ -25,9 +43,9 @@ def process_task():
 #(1, 3, None, u'cmd', u'params', u'queued', None, u'2017-10-03 11:10:35', None
   (id_task, id_run, id_client, cmd, params, status, log, changed, score) = task
 
-  proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  data.update_task(id_task, name, db.PROCESSING)
 
-  data.update_task(id_task, db.PROCESSING)
+  proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
   log = []
 
@@ -50,9 +68,9 @@ def process_task():
     else:
       score = 0
 
-    data.update_task(id_task, db.DONE, '\n'.join(log), score)
+    data.update_task(id_task, name, db.DONE, '\n'.join(log), score)
   else:
-    data.update_task(id_task, db.FAILED, '\n'.join(log))
+    data.update_task(id_task, name, db.FAILED, '\n'.join(log))
 
   time.sleep(1)
 
@@ -61,6 +79,6 @@ def process_task():
 
 if __name__ == '__main__':
     # really not much to do here
-    register_client()
     while True:
+      register_client()
       process_task()

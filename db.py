@@ -11,8 +11,8 @@ PROCESSING = 'processing'
 DONE = 'done'
 FAILED = 'failed'
 
-IDLE_CHECK_INTERVAL_MIN = 0.1
-
+ONLINE = 'online'
+SHUTDOWN = 'shutdown'
 
 DBNAME = 'runnn_data'
 
@@ -32,7 +32,7 @@ class DB:
       'CREATE TABLE IF NOT EXISTS tasks (ID_task INTEGER PRIMARY KEY, ID_run, ID_client, cmd, params, status, log, changed, score);')
 
     c.execute(
-      'CREATE TABLE IF NOT EXISTS clients (ID_client INTEGER PRIMARY KEY, last_online, status, gpu_string);')
+      'CREATE TABLE IF NOT EXISTS clients (ID_client PRIMARY KEY, last_online, status, gpu_string, next_action);')
 
     self._commit_and_close(conn, c)
 
@@ -89,10 +89,10 @@ class DB:
     else:
       return rows[0]
 
-  def update_task(self, id_task, status, log='', score=0):
+  def update_task(self, id_task, client_name, status, log='', score=0):
     def update(c):
-      c.execute("UPDATE tasks SET status=?, log=?, changed=(DATETIME('now')), score=? WHERE ID_task=?",
-                  (status, log, score, id_task))
+      c.execute("UPDATE tasks SET status=?, log=?, changed=(DATETIME('now')), score=?, ID_client=? WHERE ID_task=?",
+                  (status, log, score, client_name, id_task))
     self._run(update)
 
 
@@ -112,6 +112,29 @@ class DB:
       return self._run(get_scores_by_id)
     else:
       return 'please provide either a run_id or a run_tag'
+
+
+
+
+  # clients
+
+  def set_client_status(self, name, status, gpu_string):
+    def set_client(c):
+      c.execute('REPLACE INTO clients (ID_client, last_online, status, gpu_string) VALUES (?, (DATETIME("now")), ?,?)', (name, status, gpu_string))
+
+    self._run(set_client)
+
+  def check_action(self, name):
+    def check(c):
+      c.execute('SELECT next_action FROM clients WHERE ID_client=?', (name,))
+      return c.fetchone()
+
+    def update(c):
+      c.execute('UPDATE clients SET next_action="" WHERE ID_client=?', (name,))
+
+    result = self._run(check)
+    self._run(update)
+    return result
 
   def _commit_and_close(self, conn, cursor):
     conn.commit()
