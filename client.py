@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import argparse
 import subprocess
 import time
 import db
@@ -32,7 +32,7 @@ def register_client():
   data.set_client_status(name, db.ONLINE, gpu_info)
 
 
-def process_task():
+def process_task(gpu):
   task = data.get_task()
 
   if task is None:
@@ -41,12 +41,14 @@ def process_task():
 
   print('processing task', task)
 
+  cuda_string = 'CUDA_VISIBLE_DEVICES=' + str(gpu)+' '
+
 #(1, 3, None, u'cmd', u'params', u'queued', None, u'2017-10-03 11:10:35', None
   (id_task, id_run, id_client, cmd, params, status, log, changed, score) = task
 
   data.update_task(id_task, name, db.PROCESSING)
 
-  proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  proc = subprocess.Popen(cuda_string + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
   log = []
 
@@ -80,6 +82,14 @@ def process_task():
 
 if __name__ == '__main__':
     # really not much to do here
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--gpu", help="GPU ID", default=0, type=int)
+
+    args = parser.parse_args()
+
+    gpu = args.gpu
+
     while True:
       register_client()
-      process_task()
+      process_task(gpu)
