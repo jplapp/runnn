@@ -10,8 +10,8 @@ data = db.DB()
 # simple actions that are just sql commands
 sql_actions = {
   'show_clients': 'SELECT * FROM clients',
-  'good_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run and score > 0.95 group by runs.id_run',
-  'count_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run and score > 0.1 group by runs.id_run',
+  'good_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run AND score > 0.95 GROUP BY runs.id_run',
+  'count_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run AND score > 0.1 GROUP BY runs.id_run',
 }
 
 
@@ -38,7 +38,13 @@ def run_sql(args):
   data.execute(args.action[1])
 
 
+def list_actions(_=0):
+  for a in list(actions.keys()) + list(sql_actions.keys()):
+    print(a)
+
+
 actions = {
+  'actions': list_actions,
   'run': add_run,
   'get_scores': get_scores,
   'sql': run_sql,
@@ -59,7 +65,8 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   if len(args.action) == 0:
-    print('please specify an action')
+    print('please specify an action, should be in')
+    list_actions()
   else:
     action = args.action[0]
     if action in actions:

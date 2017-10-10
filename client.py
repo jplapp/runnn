@@ -67,7 +67,7 @@ def process_task(gpu):
     score_lines = [line for line in log if line.startswith(SCORE_PREFIX)]
 
     if len(score_lines):
-      score = float(score_lines[0][len(SCORE_PREFIX)+1:])
+      score = float(score_lines[-1][len(SCORE_PREFIX)+1:])
     else:
       score = 0
 
