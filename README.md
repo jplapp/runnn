@@ -22,7 +22,9 @@ check scores
 
 analyze results
 `python3 server.py sql --cmd 'SELECT log FROM tasks WHERE id_task = 47'`
+
 `python3 server.py sql --cmd 'SELECT log FROM tasks WHERE score > 0.8'`
+
 `python3 server.py sql --cmd 'SELECT score FROM tasks WHERE id_run = 15 and cmd LIKE "%learning_rate=0.001%"'`
 Results will be printed to the console. Any sql query is possible!
 
