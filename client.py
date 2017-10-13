@@ -39,6 +39,7 @@ def get_gpu_usage(gpu):
     query = 'nvidia-smi --query-gpu=utilization.gpu --format=csv,nounits,noheader | sed -n "{}p"'.format(gpu+1)
 
     cur_usage.append(int(subprocess.getoutput(query)))
+    time.sleep(1)
 
   return np.mean(np.asarray(cur_usage))
 
