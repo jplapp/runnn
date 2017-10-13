@@ -13,8 +13,9 @@ sql_actions = {
   'show_clients': 'SELECT * FROM clients',
   'good_runs': 'SELECT runs.*, '
                   '100. * (select count(*) from tasks as t3 where t3.id_run = runs.id_run and score > 0.95) '
-                   '/ (select count(*) from tasks as t2 where t2.id_run = runs.id_run and score > 0) as good_run_percentage '
-                'FROM runs GROUP BY runs.id_run',
+                   '/ (select count(*) from tasks as t2 where t2.id_run = runs.id_run and score > 0) as good_run_percentage,'
+                  '(select count(*) from tasks as t2 where t2.id_run = runs.id_run and score > 0) as run_count '
+                'FROM runs GROUP BY runs.id_run HAVING run_count > 4',
   'count_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run AND score > 0.1 GROUP BY runs.id_run',
 }
 
