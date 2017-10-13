@@ -93,6 +93,10 @@ def process_task(gpu):
   else:
     data.update_task(id_task, name, db.FAILED, '\n'.join(log))
 
+    print('exiting client, as task failed', name)
+    import sys
+    sys.exit()
+
   time.sleep(1)
 
 
