@@ -65,7 +65,7 @@ class DB:
 
     for i in range(num_iters):
       self._run(add_task)
-      time.sleep(0.2)
+      time.sleep(0.05)
 
 
   def drop_run(self, run_id):
