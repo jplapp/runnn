@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import time
 import db
+import numpy as np
 
 data = db.DB()
 
@@ -32,7 +33,23 @@ def register_client():
   data.set_client_status(name, db.ONLINE, gpu_info)
 
 
+def get_gpu_usage(gpu):
+  cur_usage = []
+  for i in range(3):
+    query = 'nvidia-smi --query-gpu=utilization.gpu --format=csv,nounits,noheader | sed -n "{}p"'.format(gpu+1)
+
+    cur_usage.append(int(subprocess.getoutput(query)))
+
+  return np.mean(np.asarray(cur_usage))
+
 def process_task(gpu):
+  # check GPU usage. If used, wait
+  usage = get_gpu_usage(gpu)
+  print('usage', usage)
+  if usage > 20:
+    time.sleep(SLEEP_TIME)
+    return
+
   task = data.get_task()
 
   if task is None:
