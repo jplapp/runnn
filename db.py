@@ -32,6 +32,9 @@ class DB:
       'CREATE TABLE IF NOT EXISTS tasks (ID_task INTEGER PRIMARY KEY, ID_run, ID_client, cmd, params, status, log, changed, score);')
 
     c.execute(
+      'CREATE TABLE IF NOT EXISTS result_info (ID_task INTEGER,name, value);')
+
+    c.execute(
       'CREATE TABLE IF NOT EXISTS clients (ID_client PRIMARY KEY, last_online, status, gpu_string, next_action);')
 
     self._commit_and_close(conn, c)
@@ -95,6 +98,17 @@ class DB:
                   (status, log, score, client_name, id_task))
     self._run(update)
 
+  def add_task_result_info(self, id_task, info):
+    """ info is a dict with info[name] = value"""
+    values_to_insert = []
+    for key, value in info.items():
+      values_to_insert.append([id_task, key, value])
+
+    def update(c):
+      c.executemany("""
+          INSERT INTO result_info (ID_task, name, value) VALUES (?, ?, ?)""", values_to_insert)
+
+    self._run(update)
 
 
   def get_scores(self, run_tag=None, id_run=None):

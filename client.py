@@ -9,6 +9,7 @@ data = db.DB()
 
 SLEEP_TIME = 10  # seconds
 SCORE_PREFIX = 'final_score'
+RESULT_INFO_PREFIX = '@@'
 
 name = subprocess.getoutput('hostname')
 
@@ -90,6 +91,24 @@ def process_task(gpu):
       score = 0
 
     data.update_task(id_task, name, db.DONE, '\n'.join(log), score)
+
+    # find additional info
+    info_lines = [line for line in log if line.startswith(RESULT_INFO_PREFIX)]
+
+    info = dict()
+    for line in info_lines:
+      try:
+        c_ind = line.index(':')
+      except ValueError:
+        continue
+
+      param_name = line[len(RESULT_INFO_PREFIX):c_ind]
+      value = line[c_ind+1:]
+      print(param_name, value)
+      info[param_name] = value
+
+    data.add_task_result_info(id_task, info)
+
   else:
     data.update_task(id_task, name, db.FAILED, '\n'.join(log))
 
