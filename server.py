@@ -82,6 +82,42 @@ def hp_random_search(args):
 
 
 
+def hp_combinatorial_search(args):
+  """
+  try all combinations of hyperparameters specified in a config file
+  starts training runs with --num_iters tasks each
+  all runs will have the same tag
+  """
+  import yaml
+
+  param_ranges = yaml.load(open(args.action[1]))
+
+  choices = [[]]  # array of param choices, like [ [(k1,v1),(k2,v1),...],     [(k1,v2, k2,v1), ...], ...]
+  for key, values in param_ranges.items():
+    new_choices = []
+    for existing_choice in choices:
+      if not isinstance(values, list):
+        new_choices.append(existing_choice + [(key, values)])
+      else:
+        for value in values:
+          new_choices.append(existing_choice + [(key, value)])
+
+    choices = new_choices
+
+  base_cmd = args.cmd
+  print('adding {} choices'.format(len(choices)))
+  for choice in choices:
+    cmd = base_cmd
+    for (k, v) in choice:
+      cmd += ' --{}={}'.format(k, v)
+
+    args.cmd = cmd  # todo: mutating args is probably not the best idea
+
+    print(args)
+    add_run(args)
+
+
+
 
 actions = {
   'actions': list_actions,
@@ -89,7 +125,8 @@ actions = {
   'get_scores': get_scores,
   'sql': run_sql,
   'kill_client': kill_client,
-  'search_hps': hp_random_search
+  'search_hps_random': hp_random_search,
+  'search_hps': hp_combinatorial_search
 }
 
 if __name__ == '__main__':
