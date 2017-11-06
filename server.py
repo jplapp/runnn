@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import argparse
+import subprocess
 
 import db
 import numpy as np
@@ -17,11 +18,15 @@ sql_actions = {
                   '(select count(*) from tasks as t2 where t2.id_run = runs.id_run and score > 0) as run_count '
                 'FROM runs GROUP BY runs.id_run HAVING run_count > 4',
   'count_runs': 'SELECT runs.*, count(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run AND score > 0.1 GROUP BY runs.id_run',
+  'run_avg': 'SELECT runs.*, AVG(tasks.score) FROM runs, tasks WHERE runs.id_run = tasks.id_run AND score > 0 GROUP BY runs.id_run',
 }
 
 
 # more complex actions that require a function
 def add_run(args):
+  if args.tag is None:
+    args.tag = subprocess.getoutput('cd {} && git rev-parse --short --verify HEAD'.format(args.target_dir))
+
   data.add_run(args.tag, args.cmd, args.params, args.num_iters)
 
 
@@ -135,6 +140,7 @@ if __name__ == '__main__':
   parser.add_argument("action", nargs='*')
 
   parser.add_argument("--tag", help="Tag", default=None)
+  parser.add_argument("--target_dir", help="Tag", default='~/lba_tf/semisup')
   parser.add_argument("--run_id", help="Id of the run", type=int, default=None)
   parser.add_argument("--cmd", help="Command to use", default='train.py')
   parser.add_argument("--params", help="Params for the command", default='')
