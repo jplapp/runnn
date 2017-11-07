@@ -8,6 +8,7 @@ import numpy as np
 data = db.DB()
 
 SLEEP_TIME = 10  # seconds
+PARAM_PREFIX = 'flags:'
 SCORE_PREFIX = 'final_score'
 RESULT_INFO_PREFIX = '@@'
 
@@ -44,6 +45,11 @@ def get_gpu_usage(gpu):
 
   return np.mean(np.asarray(cur_usage))
 
+def get_free_memory(gpu):
+  query = 'nvidia-smi --query-gpu=memory.free --format=csv,nounits,noheader | sed -n "{}p"'.format(gpu+1)
+
+  return int(subprocess.getoutput(query))
+
 def process_task(gpu):
   # check GPU usage. If used, wait
   usage = get_gpu_usage(gpu)
@@ -52,7 +58,9 @@ def process_task(gpu):
     time.sleep(SLEEP_TIME)
     return
 
-  task = data.get_task()
+  free_mem = get_free_memory(gpu)
+  print('free gpu memory', free_mem)
+  task = data.get_task(free_mem)
 
   if task is None:
     time.sleep(SLEEP_TIME)
@@ -83,6 +91,12 @@ def process_task(gpu):
   rc = proc.poll()
 
   if rc == 0:
+    param_lines = [line for line in log if line.startswith(PARAM_PREFIX)]
+    if len(param_lines):
+      params = param_lines[-1][len(PARAM_PREFIX)+1:]
+    else:
+      params = ''
+
     score_lines = [line for line in log if line.startswith(SCORE_PREFIX)]
 
     if len(score_lines):
@@ -90,7 +104,7 @@ def process_task(gpu):
     else:
       score = 0
 
-    data.update_task(id_task, name, db.DONE, '\n'.join(log), score)
+    data.update_task(id_task, name, db.DONE, '\n'.join(log), score, params=params)
 
     # find additional info
     info_lines = [line for line in log if line.startswith(RESULT_INFO_PREFIX)]

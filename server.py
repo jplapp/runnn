@@ -27,7 +27,7 @@ def add_run(args):
   if args.tag is None:
     args.tag = subprocess.getoutput('cd {} && git rev-parse --short --verify HEAD'.format(args.target_dir))
 
-  data.add_run(args.tag, args.cmd, args.params, args.num_iters)
+  data.add_run(args.tag, args.cmd, args.params, args.num_iters, args.min_mem)
 
 
 def kill_client(args):
@@ -146,6 +146,7 @@ if __name__ == '__main__':
   parser.add_argument("--params", help="Params for the command", default='')
   parser.add_argument("--num_iters", help="How often the command should be repeated", type=int, default=20)
   parser.add_argument("--num_runs", help="How many runs should be started", type=int, default=1)
+  parser.add_argument("--min_mem", help="Minimum GPU memory required to run task", type=int, default=0)
 
   args = parser.parse_args()
 

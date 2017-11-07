@@ -31,6 +31,11 @@ class DB:
     c.execute(
       'CREATE TABLE IF NOT EXISTS tasks (ID_task INTEGER PRIMARY KEY, ID_run, ID_client, cmd, params, status, log, changed, score);')
 
+    try:
+      c.execute('ALTER TABLE tasks ADD COLUMN min_mem DEFAULT 0;')
+    except:
+      pass
+
     c.execute(
       'CREATE TABLE IF NOT EXISTS result_info (ID_task INTEGER,name, value);')
 
@@ -49,7 +54,7 @@ class DB:
     return result
 
 
-  def add_run(self, tag, cmd, params, num_iters=20):
+  def add_run(self, tag, cmd, params, num_iters=20, min_mem=0):
     # 1) add to db, get ID
     def add_to_db(c):
       c.execute('INSERT INTO runs (tag, cmd, params) VALUES (?,?,?)', (tag, cmd, params))
@@ -63,8 +68,8 @@ class DB:
 
     task_params = params
     def add_task(c):
-      c.execute('INSERT INTO tasks(ID_run, cmd, params, status, changed) VALUES (?,?,?,?,(DATETIME("now")))',
-                  (run_id, cmd, task_params, QUEUED))
+      c.execute('INSERT INTO tasks(ID_run, cmd, params, status, min_mem, changed) VALUES (?,?,?,?,?,(DATETIME("now")))',
+                  (run_id, cmd, task_params, QUEUED, min_mem))
 
     for i in range(num_iters):
       self._run(add_task)
@@ -80,9 +85,9 @@ class DB:
       c.execute('UPDATE tasks SET status = ? WHERE ID_run = ?', (CANCELLED, run_id))
     self._run(drop_it)
 
-  def get_task(self):
+  def get_task(self, available_memory=99999):
     def get_tasks(c):
-      c.execute("SELECT * FROM tasks WHERE status=? LIMIT 1", (QUEUED,))
+      c.execute("SELECT id_task, id_run, id_client, cmd, params, status, log, changed, score FROM tasks WHERE status=? and min_mem < ? ORDER BY min_mem DESC LIMIT 1", (QUEUED, available_memory))
       return c.fetchall()
 
     rows = self._run(get_tasks)
@@ -92,10 +97,10 @@ class DB:
     else:
       return rows[0]
 
-  def update_task(self, id_task, client_name, status, log='', score=0):
+  def update_task(self, id_task, client_name, status, log='', score=0, params=''):
     def update(c):
-      c.execute("UPDATE tasks SET status=?, log=?, changed=(DATETIME('now')), score=?, ID_client=? WHERE ID_task=?",
-                  (status, log, score, client_name, id_task))
+      c.execute("UPDATE tasks SET status=?, log=?, changed=(DATETIME('now')), score=?, ID_client=?, params=? WHERE ID_task=?",
+                  (status, log, score, client_name, params, id_task))
     self._run(update)
 
   def add_task_result_info(self, id_task, info):
