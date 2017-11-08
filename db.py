@@ -16,6 +16,16 @@ SHUTDOWN = 'shutdown'
 
 DBNAME = 'runnn_data'
 
+RESULT_INFO_COLUMNS = [
+  'score',
+  'train_loss',
+  'reg_loss',
+  'estimated_error',
+  'centroid_norm',
+  'emb_norm',
+  'k_score',
+  'svm_score',
+]
 
 class DB:
 
@@ -28,16 +38,9 @@ class DB:
     c.execute(
       'CREATE TABLE IF NOT EXISTS runs (ID_run INTEGER PRIMARY KEY, tag, cmd, params);')
 
+    additional_columns = ",".join(RESULT_INFO_COLUMNS)
     c.execute(
-      'CREATE TABLE IF NOT EXISTS tasks (ID_task INTEGER PRIMARY KEY, ID_run, ID_client, cmd, params, status, log, changed, score);')
-
-    try:
-      c.execute('ALTER TABLE tasks ADD COLUMN min_mem DEFAULT 0;')
-    except:
-      pass
-
-    c.execute(
-      'CREATE TABLE IF NOT EXISTS result_info (ID_task INTEGER,name, value);')
+      'CREATE TABLE IF NOT EXISTS tasks (ID_task INTEGER PRIMARY KEY, ID_run, ID_client, cmd, params, status, log, changed, min_mem DEFAULT 0, '+additional_columns+');')
 
     c.execute(
       'CREATE TABLE IF NOT EXISTS clients (ID_client PRIMARY KEY, last_online, status, gpu_string, next_action);')
@@ -105,24 +108,33 @@ class DB:
 
   def add_task_result_info(self, id_task, info):
     """ info is a dict with info[name] = value"""
-    values_to_insert = []
+
+    # find columns to update
+    used_columns = {}
     for key, value in info.items():
-      values_to_insert.append([id_task, key, value])
+      try:
+        ind = RESULT_INFO_COLUMNS.index(key)
+        used_columns[key] = value
+      except:
+        pass
+
+    values = list(used_columns.values())
+    update_stmts = ['{} = ?'.format(key) for key in used_columns.keys()]
 
     def update(c):
-      c.executemany("""
-          INSERT INTO result_info (ID_task, name, value) VALUES (?, ?, ?)""", values_to_insert)
+      c.execute("""
+          UPDATE tasks SET {} WHERE id_task=?""".format(','.join(update_stmts)), values+[id_task])
 
     self._run(update)
 
 
   def get_scores(self, run_tag=None, id_run=None):
     def get_scores_with_tag(c):
-      c.execute("SELECT ID_task, score from tasks, runs WHERE tasks.ID_run = runs.ID_run AND runs.tag = ? ORDER BY score ASC", (run_tag,))
+      c.execute("SELECT ID_task, score, status from tasks, runs WHERE tasks.ID_run = runs.ID_run AND runs.tag = ? ORDER BY score ASC", (run_tag,))
       return c.fetchall()
 
     def get_scores_by_id(c):
-      c.execute("SELECT ID_task, score from tasks WHERE tasks.ID_run = ? ORDER BY score ASC", (id_run,))
+      c.execute("SELECT ID_task, score, status from tasks WHERE tasks.ID_run = ? ORDER BY score ASC", (id_run,))
       return c.fetchall()
 
     if run_tag is not None:

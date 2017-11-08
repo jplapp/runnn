@@ -67,8 +67,11 @@ def hp_random_search(args):
   def sample_params(config):
     params = []
     for key, values in config.items():
-      value = np.random.choice(values)
-      params.append([key, value])
+      if not isinstance(values, list):
+        params.append([key, values])
+      else:
+        value = np.random.choice(values)
+        params.append([key, value])
     return params
 
   base_cmd = args.cmd

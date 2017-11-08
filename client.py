@@ -50,16 +50,20 @@ def get_free_memory(gpu):
 
   return int(subprocess.getoutput(query))
 
-def process_task(gpu):
+def process_task(gpu, skip_gpu_check):
   # check GPU usage. If used, wait
-  usage = get_gpu_usage(gpu)
-  print('usage', usage)
-  if usage > 20:
-    time.sleep(SLEEP_TIME)
-    return
+  if not skip_gpu_check:  # magic number to just run it
+    usage = get_gpu_usage(gpu)
+    print('usage', usage)
+    if usage > 20:
+      time.sleep(SLEEP_TIME)
+      return
 
-  free_mem = get_free_memory(gpu)
-  print('free gpu memory', free_mem)
+    free_mem = get_free_memory(gpu)
+    print('free gpu memory', free_mem)
+  else:
+    free_mem = 99999
+
   task = data.get_task(free_mem)
 
   if task is None:
@@ -140,11 +144,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--gpu", help="GPU ID", default=0, type=int)
+    parser.add_argument("--skip_gpu_check", help="Skip check if GPU is available", default=False, type=bool)
 
     args = parser.parse_args()
 
     gpu = args.gpu
+    skip_gpu_check = args.skip_gpu_check
 
     while True:
       register_client()
-      process_task(gpu)
+      process_task(gpu, skip_gpu_check)
