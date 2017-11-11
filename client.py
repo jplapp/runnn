@@ -79,6 +79,8 @@ def process_task(gpu, skip_gpu_check):
 
   data.update_task(id_task, name, db.PROCESSING)
 
+  cmd += ' --taskid '+str(id_task)
+
   proc = subprocess.Popen(cuda_string + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
   log = []
