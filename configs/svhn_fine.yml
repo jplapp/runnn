@@ -1,0 +1,30 @@
+dataset: 'svhn'
+architecture: ['resnet_cifar_model','resnet_mnist_model']
+max_steps: [34000]
+decay_steps: [8000, 10000,15000,20000]
+l1_weight: 0
+norm_weight: [0.00001,0.000005]
+init_with_kmeans: True
+num_augmented_samples: [3,4]
+num_unlabeled_images: [50000,70000,100000,150000]
+logdir: '/efs/svhn'
+
+
+# general  : 24 combinations
+learning_rate: [0.001, 0.001, 0.0008, 0.0005]
+warmup_steps: [2000,4000]
+unsup_batch_size: [130,150]
+num_blocks: [3,5]                # blocks in resnet
+dropout_keep_prob: [0.8,0.9,0.95,1]           # most reliable results
+emb_size: 64
+
+# optimizer:  4 combination
+beta1: [0.6,0.8]
+beta2: [0.9,0.99]
+
+# centroid associations: 2
+visit_weight_base: [0.05,0.1,0.3,0.5,0.7]
+
+# augmentation associations: 2
+reg_decay_factor: [0.2,0.4,0.6,0.8]             # reduce reg weight after kmeans init
+reg_warmup_steps: [4000,5000,6000,7000,8000,9000,10000,12000]

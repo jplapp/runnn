@@ -1,0 +1,2 @@
+dataset: ['cifar_inmemory','svhn','stl10']
+seed: [1,2,3]

@@ -1,0 +1,33 @@
+max_steps: 5000
+decay_steps: 10000
+l1_weight: 0
+norm_weight: 0
+logit_weight: 0
+init_with_kmeans: True
+num_augmented_samples: 4
+logdir: '/work/plapp/logs'
+
+learning_rate: 0.0008
+warmup_steps: 2000
+unsup_batch_size: 130
+
+visit_weight_base: 0.3
+
+reg_decay_factor: 0.3           # reduce reg weight after kmeans init
+reg_warmup_steps: 5005
+
+cluster_association_weight: 0
+
+reg_association_weight: 0.9
+
+# transformation loss: 3
+trafo_weight: 0
+
+# differing things
+dataset: 'stl10'
+architecture: 'resnet_stl10_model'
+dropout_keep_prob: 1          # most reliable results
+num_blocks: 3                # blocks in resnet
+emb_size: 64
+num_unlabeled_images: 0
+

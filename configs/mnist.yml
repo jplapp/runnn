@@ -1,0 +1,17 @@
+dataset: 'mnist'
+architecture: 'resnet_mnist_model'
+max_steps: 12000
+decay_steps: 5000
+l1_weight: 0
+norm_weight: 0.0001
+init_with_kmeans: True
+reg_decay_factor: [0.2,0.5,0.8]
+num_blocks: [2,3]
+dropout_keep_prob: [0.6,0.8]
+emb_size: [64,128]
+
+learning_rate: 0.001
+warmup_steps: [1000,2000]
+unsup_batch_size: 100
+visit_weight_base: 1.0
+reg_warmup_steps: 1500

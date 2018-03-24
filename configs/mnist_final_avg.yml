@@ -1,0 +1,41 @@
+dataset: 'mnist'
+architecture: 'resnet_mnist_model'
+max_steps: 23000
+decay_steps: 10000
+l1_weight: 0
+norm_weight:  0.00001
+init_with_kmeans: True
+num_augmented_samples: 4
+logdir: '/work/plapp/logs'
+
+
+# general  : 24 combinations
+learning_rate: 0.0008
+warmup_steps: 2000
+unsup_batch_size: 130
+num_blocks: 3                # blocks in resnet
+dropout_keep_prob: 0.8           # most reliable results
+emb_size: 64
+
+# optimizer:  4 combination
+beta1: 0.8
+beta2: 0.9
+
+# centroid associations: 2
+visit_weight_base: 0.8
+
+# augmentation associations: 2
+reg_decay_factor: 0.3            # reduce reg weight after kmeans init
+reg_warmup_steps: 1000
+
+
+# centroid associations: 2
+cluster_association_weight: 1
+
+# augmentation associations: 2
+reg_association_weight: 0.9
+
+# transformation loss: 3
+trafo_weight: 2e-5
+
+trafo_separate_loss_collection: True

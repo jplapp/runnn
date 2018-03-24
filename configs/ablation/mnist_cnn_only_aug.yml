@@ -1,0 +1,22 @@
+dataset: 'mnist'
+logdir: '/work/plapp/logs'
+l1_weight: 0
+warmup_steps: 2000
+reg_warmup_steps: 1000
+visit_weight_base: 0.8
+learning_rate: 0.0008
+norm_weight:  0
+num_augmented_samples: 4
+init_with_kmeans: True
+max_steps: 1000
+decay_steps: 10000
+unsup_batch_size: 100
+reg_association_weight: 0.9
+cluster_association_weight: 0
+logit_weight: 0
+reg_decay_factor: 1            # reduce reg weight after kmeans init
+trafo_weight: 0
+trafo_separate_loss_collection: True
+
+scale_match_ab: 1
+norm_target: 1

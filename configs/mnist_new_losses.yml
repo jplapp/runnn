@@ -1,0 +1,46 @@
+dataset: 'mnist'
+architecture: 'resnet_mnist_model'
+max_steps: 17000
+decay_steps: [5000,7000]
+l1_weight: 0
+norm_weight: [0.0001, 0.00001]
+init_with_kmeans: True
+num_augmented_samples: [3,4]
+logdir: '/work/plapp/logs'
+
+
+# general  : 24 combinations
+learning_rate: [0.001, 0.001, 0.0008, 0.0005]
+warmup_steps: [1000, 1500, 2000]
+unsup_batch_size: 100
+num_blocks: 3                # blocks in resnet
+dropout_keep_prob: [0.6,0.7,0.8,0.9]           # most reliable results
+emb_size: 64
+
+# optimizer:  4 combination
+beta1: [0.8]
+beta2: [0.9,0.99]
+
+# centroid associations: 2
+visit_weight_base: [0.6,0.7,0.8,0.9]
+
+# augmentation associations: 2
+reg_decay_factor: [0.2,0.25,0.4]            # reduce reg weight after kmeans init
+reg_warmup_steps: [1000,1500,2000,2500]
+
+
+# centroid associations: 2
+centroid_association_weight: [0,0.1,0.2 ,0.3,0.4,0.5, 0.6,0.7,0.8,0.9, 1]
+
+# augmentation associations: 2
+reg_association_weight: [0,0.1,0.2 ,0.3,0.4,0.5, 0.6,0.7,0.8,0.9, 1]
+reg_decay_factor: 0.2            # reduce reg weight after kmeans init
+
+# cluster hardening: 3
+cluster_hardening_weight: [1.0,0.5,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,5e-05,1e-05,5e-06,1e-06,5e-07,1e-07,5e-08,1e-08,5e-09]
+
+# logit entropy: 3
+logit_entropy_weight: [1.0,0.5,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,5e-05,1e-05,5e-06,1e-06,5e-07,1e-07,5e-08,1e-08,5e-09]
+
+# transformation loss: 3
+trafo_weight: [1.0,0.5,0.1,0.05,0.01,0.005,0.001,0.0005,0.0001,5e-05,1e-05,5e-06,1e-06,5e-07,1e-07,5e-08,1e-08,5e-09]

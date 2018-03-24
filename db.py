@@ -107,6 +107,9 @@ class DB:
     self._run(update)
 
   def add_task_result_info(self, id_task, info):
+    if len(info.keys()) == 0:
+      return
+
     """ info is a dict with info[name] = value"""
 
     # find columns to update

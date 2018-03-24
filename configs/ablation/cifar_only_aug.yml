@@ -1,0 +1,33 @@
+dataset: ['cifar_inmemory','svhn']
+architecture: 'resnet_mnist_model'
+max_steps: 5000
+decay_steps: 10000
+l1_weight: 0
+norm_weight: 0
+logit_weight: 0
+init_with_kmeans: True
+num_augmented_samples: 4
+num_unlabeled_images: 0
+logdir: '/work/plapp/logs'
+
+learning_rate: 0.0008
+warmup_steps: 2000
+unsup_batch_size: 130
+num_blocks: 5                # blocks in resnet
+dropout_keep_prob: 1           # most reliable results
+emb_size: 64
+
+
+scale_match_ab: 1
+norm_target: 1
+
+visit_weight_base: 0.3
+
+reg_decay_factor: 0.3            # reduce reg weight after kmeans init
+reg_warmup_steps: 5005
+
+
+cluster_association_weight: 0
+reg_association_weight: 0.9
+
+trafo_weight: 0

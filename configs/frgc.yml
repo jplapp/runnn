@@ -1,0 +1,12 @@
+dataset: 'frgc'
+architecture: 'mnist_model_dropout'
+max_steps: 7000
+decay_steps: 5000
+l1_weight: 0
+init_with_kmeans: True
+
+learning_rate: [0.001, 0.0005, 0.0001]
+warmup_steps: [1,1000,3000]
+unsup_batch_size: [100, 200]
+visit_weight_base: [0.1, 0.05]
+reg_warmup_steps: [2000, 3000]

@@ -1,0 +1,40 @@
+max_steps: 50000
+decay_steps: 7000
+l1_weight: 0
+norm_weight:  0.00001
+init_with_kmeans: True
+num_augmented_samples: 4
+logdir: '/efs/stl10'
+
+
+# general  : 24 combinations
+learning_rate: 0.0008
+warmup_steps: 1500
+unsup_batch_size: 130
+
+beta1: 0.8
+beta2: 0.9
+
+visit_weight_base: 0.3
+
+reg_decay_factor: 0.3            # reduce reg weight after kmeans init
+reg_warmup_steps: 1000
+
+
+cluster_association_weight: 1
+
+reg_association_weight: 0.9
+
+# transformation loss: 3
+trafo_weight: 2e-5
+trafo_separate_loss_collection: True
+
+
+# differing things
+dataset: 'stl10'
+architecture: 'resnet_stl10_model'
+dropout_keep_prob: 0.9           # most reliable results
+num_blocks: 3                # blocks in resnet
+emb_size: 128
+num_unlabeled_images: 0
+
